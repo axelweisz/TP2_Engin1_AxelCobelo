@@ -4,17 +4,19 @@ public class CameraController : MonoBehaviour
 {
     [SerializeField]
     private Transform m_objectToLookAt;
+
     [SerializeField]
     private float m_rotationSpeed = 1.0f;
     [SerializeField]
     private Vector2 m_clampingXRotationValues = Vector2.zero;
+
     private float m_desiredDistance = 10.0f;
     [SerializeField]
     private float m_lerpSpeed = 0.05f;
+
     [SerializeField]
     private Vector2 m_zoomClampValues = new Vector2(2.0f, 15.0f);
 
-    // Update is called once per frame
     void Update()
     {
         UpdateHorizontalMovements();
@@ -22,7 +24,8 @@ public class CameraController : MonoBehaviour
         UpdateCameraScroll();
     }
 
-    private void FixedUpdate()
+    #region updates/mov
+    private void FixedUpdate()//do all physics here
     {
         FixedUpdateCameraLerp();
         MoveCameraInFrontOfObstructionsFUpdate();
@@ -62,6 +65,7 @@ public class CameraController : MonoBehaviour
         m_desiredDistance += Input.mouseScrollDelta.y;
         m_desiredDistance = Mathf.Clamp(m_desiredDistance, m_zoomClampValues.x, m_zoomClampValues.y);
     }
+    #endregion
 
     private void MoveCameraInFrontOfObstructionsFUpdate()
     {
@@ -75,7 +79,7 @@ public class CameraController : MonoBehaviour
 
         if (Physics.Raycast(m_objectToLookAt.position, vecteurDiff, out hit, distance, layerMask))
         {
-            //J'ai un objet entre mon focus et ma cam�ra
+            //J'ai un objet entre mon focus et ma cam�ra
             Debug.DrawRay(m_objectToLookAt.position, vecteurDiff.normalized * hit.distance, Color.yellow);
             transform.SetPositionAndRotation(hit.point, transform.rotation);
         }
@@ -86,6 +90,7 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    //essas aqui tinham que tah tudo num arquivo de funções auxiliares (em uma classe? Utilitys)
     private float ClampAngle(float angle)
     {
         if (angle > 180)
