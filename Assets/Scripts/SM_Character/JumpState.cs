@@ -18,14 +18,9 @@ public class JumpState : CharacterState
 
     public override void OnExit() {   Debug.Log("Exit state: JumpState\n"); }
 
-    public override void OnFixedUpdate()
-    {
-    }
+    public override void OnFixedUpdate() {}
 
-    public override void OnUpdate()
-    {
-        m_currentStateTimer -= Time.deltaTime;
-    }
+    public override void OnUpdate() { m_currentStateTimer -= Time.deltaTime; }
 
     public override bool CanEnter(IState currentState)
     {
@@ -38,8 +33,5 @@ public class JumpState : CharacterState
         return false;
     }
 
-    public override bool CanExit()
-    {
-        return m_currentStateTimer <= 0;
-    }
+    public override bool CanExit() { return m_currentStateTimer <= 0; }
 }

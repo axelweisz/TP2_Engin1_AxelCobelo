@@ -7,11 +7,9 @@ public class GroundState : CharacterState
 
     public override void OnEnter()
     {
-       
         m_stateMachine.OnStunStimuliReceived = false;
         m_stateMachine.Animator.SetBool("IsStun", true);
         m_currentStateDuration = STUN_DURATION;
-
         Debug.Log("Enter state: GroundState\n");
     }
 
@@ -32,7 +30,8 @@ public class GroundState : CharacterState
     private void FixedUpdateQuickDeceleration()
     {
         var oppositeDirectionForceToApply = -m_stateMachine.RB.velocity *
-        m_stateMachine.DecelerationValue * Time.fixedDeltaTime;
+                                            m_stateMachine.DecelerationValue *
+                                            Time.fixedDeltaTime;
         m_stateMachine.RB.AddForce(oppositeDirectionForceToApply, ForceMode.Acceleration);
     }
 }

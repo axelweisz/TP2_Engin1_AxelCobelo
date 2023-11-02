@@ -5,11 +5,7 @@ public class CharacterFloorTrigger : MonoBehaviour
     public bool IsOnFloor { get; private set; }
     private CharacterControllerStateMachine ccsm;
 
-    private void Start()
-    {
-        ccsm = GetComponentInParent<CharacterControllerStateMachine>();
-    }
-
+    private void Start() { ccsm = GetComponentInParent<CharacterControllerStateMachine>();}
 
     private void OnTriggerStay(Collider other)
     {

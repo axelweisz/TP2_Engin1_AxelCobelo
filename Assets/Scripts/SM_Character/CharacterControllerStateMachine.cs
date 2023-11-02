@@ -45,14 +45,12 @@ public class CharacterControllerStateMachine : BaseStateMachine<CharacterState>,
         m_possibleStates.Add(new HitState());
         m_possibleStates.Add(new GroundState());
         m_possibleStates.Add(new AttackingState());
+        m_possibleStates.Add(new NonPlayingState());
     }
 
     protected override void Start()
     {
-        foreach (CharacterState state in m_possibleStates)
-        {
-            state.OnStart(this);
-        }
+        foreach (CharacterState state in m_possibleStates)  { state.OnStart(this); }
         //TO DO: fazer aqui o if(GM.CinematicSM)
         m_currentState = m_possibleStates[0];
         m_currentState.OnEnter();
