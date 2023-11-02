@@ -10,15 +10,13 @@ public class JumpState : CharacterState
         Debug.Log("Enter state: JumpState\n");
 
         //Effectuer le saut
+        m_stateMachine.m_audioAndFX.PlayFXSys(EActionTYpe.Jump);
         m_stateMachine.RB.AddForce(Vector3.up * m_stateMachine.JumpIntensity, ForceMode.Acceleration);
         m_currentStateTimer = STATE_EXIT_TIMER;
         m_stateMachine.Animator.SetTrigger("Jump");
     }
 
-    public override void OnExit()
-    {
-        Debug.Log("Exit state: JumpState\n");
-    }
+    public override void OnExit() {   Debug.Log("Exit state: JumpState\n"); }
 
     public override void OnFixedUpdate()
     {
@@ -33,8 +31,9 @@ public class JumpState : CharacterState
     {
         if (currentState is FreeState)
         {
+
             return Input.GetKeyDown(KeyCode.Space);
-        }
+        } 
 
         return false;
     }
