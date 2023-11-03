@@ -1,102 +1,75 @@
+using Cinemachine;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    public CinemachineVirtualCamera virtualCamera;
+    public float sensitivity = 0.02f;
+    CinemachineTransposer transposer;
+    private Vector3 lastMousePosition;
     [SerializeField]
-    private Transform m_objectToLookAt;
-
+    private float minOffsetX = -3.0f;
     [SerializeField]
-    private float m_rotationSpeed = 1.0f;
+    private float maxOffsetX = 3.0f;
     [SerializeField]
-    private Vector2 m_clampingXRotationValues = Vector2.zero;
-
-    private float m_desiredDistance = 10.0f;
+    private float minOffsetY = 0.0f;
     [SerializeField]
-    private float m_lerpSpeed = 0.05f;
-
+    private float maxOffsetY = 5.0f;
     [SerializeField]
-    private Vector2 m_zoomClampValues = new Vector2(2.0f, 15.0f);
+    private float minOffsetZ = -3.5f;
+    [SerializeField]
+    private float maxOffsetZ = -3.5f;
+    private void Start()
+    {
+        transposer = virtualCamera.GetCinemachineComponent<CinemachineTransposer>();
+        lastMousePosition = Input.mousePosition;
+    }
 
     void Update()
     {
-        UpdateHorizontalMovements();
-        UpdateVerticalMovements();
-        UpdateCameraScroll();
+        UpdateCamOffsets();
     }
 
-    #region updates/mov
-    private void FixedUpdate()//do all physics here
+    //#region updates/mov
+    //private void FixedUpdate()//do all physics here
+    //{
+    //    FixedUpdateCameraLerp();
+    //    MoveCameraInFrontOfObstructionsFUpdate();
+    //}
+
+    //private void FixedUpdateCameraLerp()
+    //{
+    //    var desiredPosition = m_objectToLookAt.position - (transform.forward * m_desiredDistance);
+    //    transform.position = Vector3.Lerp(transform.position, desiredPosition, m_lerpSpeed);
+    //}
+
+    private void UpdateCamOffsets()
     {
-        FixedUpdateCameraLerp();
-        MoveCameraInFrontOfObstructionsFUpdate();
-    }
-
-    private void FixedUpdateCameraLerp()
-    {
-        var desiredPosition = m_objectToLookAt.position - (transform.forward * m_desiredDistance);
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, m_lerpSpeed);
-    }
-
-    private void UpdateHorizontalMovements()
-    {
-        float currentAngleX = Input.GetAxis("Mouse X") * m_rotationSpeed;
-        transform.RotateAround(m_objectToLookAt.position, m_objectToLookAt.up, currentAngleX);
-    }
-
-    private void UpdateVerticalMovements()
-    {
-        float currentAngleY = Input.GetAxis("Mouse Y") * m_rotationSpeed;
-        float eulersAngleX = transform.rotation.eulerAngles.x;
-
-        float comparisonAngle = eulersAngleX + currentAngleY;
-
-        comparisonAngle = ClampAngle(comparisonAngle);
-
-        if ((currentAngleY < 0 && comparisonAngle < m_clampingXRotationValues.x)
-            || (currentAngleY > 0 && comparisonAngle > m_clampingXRotationValues.y))
+        Vector3 currentMousePosition = Input.mousePosition;
+        if (currentMousePosition != lastMousePosition)
         {
-            return;
-        }
-        transform.RotateAround(m_objectToLookAt.position, transform.right, currentAngleY);
-    }
+            //je ne sais pas mais le code fonctionne juste pour le axis horizontal
+            float mouseX = (currentMousePosition.x - lastMousePosition.x) * sensitivity;
+            //float mouseY = (currentMousePosition.y - lastMousePosition.y) * sensitivity;
+           // float scrollInput = Input.GetAxis("Mouse ScrollWheel") * sensitivity/1000;
 
-    private void UpdateCameraScroll()
-    {
-        m_desiredDistance += Input.mouseScrollDelta.y;
-        m_desiredDistance = Mathf.Clamp(m_desiredDistance, m_zoomClampValues.x, m_zoomClampValues.y);
-    }
-    #endregion
+            // Update X and Y offsets
+            Vector3 newFollowOffset = transposer.m_FollowOffset + new Vector3(mouseX, 0f, 0f);
+            newFollowOffset.x = Mathf.Clamp(newFollowOffset.x, minOffsetX, maxOffsetX);
+            //newFollowOffset.y = Mathf.Clamp(newFollowOffset.y, minOffsetY, minOffsetY);
 
-    private void MoveCameraInFrontOfObstructionsFUpdate()
-    {
-        // Bit shift the index of the layer (8) to get a bit mask
-        int layerMask = 1 << 8;
+            // Apply the clamped offsets
+            transposer.m_FollowOffset.x = newFollowOffset.x;
+            //transposer.m_FollowOffset.y = newFollowOffset.y;
 
-        RaycastHit hit;
 
-        var vecteurDiff = transform.position - m_objectToLookAt.position;
-        var distance = vecteurDiff.magnitude;
+            // Update Z offset
+            //float newZOffset = transposer.m_FollowOffset.z + scrollInput;
+            //newZOffset = Mathf.Clamp(newZOffset, minOffsetZ, minOffsetZ);
+           // transposer.m_FollowOffset.z = newZOffset;
 
-        if (Physics.Raycast(m_objectToLookAt.position, vecteurDiff, out hit, distance, layerMask))
-        {
-            //J'ai un objet entre mon focus et ma cam�ra
-            Debug.DrawRay(m_objectToLookAt.position, vecteurDiff.normalized * hit.distance, Color.yellow);
-            transform.SetPositionAndRotation(hit.point, transform.rotation);
-        }
-        else
-        {
-            //Je n'en ai pas
-            Debug.DrawRay(m_objectToLookAt.position, vecteurDiff, Color.white);
+            lastMousePosition = currentMousePosition;
         }
     }
-
-    //essas aqui tinham que tah tudo num arquivo de funções auxiliares (em uma classe? Utilitys)
-    private float ClampAngle(float angle)
-    {
-        if (angle > 180)
-        {
-            angle -= 360;
-        }
-        return angle;
-    }
+  
 }
